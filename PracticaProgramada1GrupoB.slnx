@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="PracticaProgramada1GrupoB-BLL/PracticaProgramada1GrupoB-BLL.csproj" />
-  <Project Path="PracticaProgramada1GrupoB-DAL/PracticaProgramada1GrupoB-DAL.csproj" />
+  <Project Path="PracticaProgramada1GrupoB-BLL/PracticaProgramada1GrupoB_BLL.csproj" />
+  <Project Path="PracticaProgramada1GrupoB-DAL/PracticaProgramada1GrupoB_DAL.csproj" />
   <Project Path="PracticaProgramada1GrupoB/PracticaProgramada1GrupoB.csproj" />
 </Solution>
