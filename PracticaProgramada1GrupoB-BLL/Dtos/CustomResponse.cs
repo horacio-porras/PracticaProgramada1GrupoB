@@ -10,5 +10,13 @@ namespace PracticaProgramada1GrupoB_BLL.Dtos
         public string mensaje { get; set; }
         public T Data { get; set; }
         public int codigoStatus { get; set; }
+
+        public CustomResponse()
+        {
+            esCorrecto = true;
+            mensaje = string.Empty;
+            Data = default(T);
+            codigoStatus = 200;
+        }
     }
 }

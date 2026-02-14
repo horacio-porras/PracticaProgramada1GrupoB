@@ -1,7 +1,16 @@
+using PracticaProgramada1GrupoB_BLL;
+using PracticaProgramada1GrupoB_BLL.Servicios.Cliente;
+using PracticaProgramada1GrupoB_DAL.Repositorios.Cliente;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Inyección de dependencias
+builder.Services.AddSingleton<IClienteRepositorio, ClienteRepositorio>();
+builder.Services.AddSingleton<IClienteServicio, ClienteServicio>();
+builder.Services.AddAutoMapper(cfg => { }, typeof(MapeoClases));
 
 var app = builder.Build();
 

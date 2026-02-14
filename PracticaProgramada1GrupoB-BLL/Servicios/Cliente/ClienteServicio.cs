@@ -4,6 +4,7 @@ using PracticaProgramada1GrupoB_DAL.Repositorios.Cliente;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace PracticaProgramada1GrupoB_BLL.Servicios.Cliente
 {
@@ -18,29 +19,196 @@ namespace PracticaProgramada1GrupoB_BLL.Servicios.Cliente
             _mapper = mapper;
         }
 
-        public Task<CustomResponse<ClienteDto>> ActualizarClienteAsync(ClienteDto clienteDto)
+        public async Task<CustomResponse<List<ClienteDto>>> ObtenerClientesAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var entidades = _clienteRepositorio.ObtenerClientes();
+                var dtos = _mapper.Map<List<ClienteDto>>(entidades);
+                return await Task.FromResult(new CustomResponse<List<ClienteDto>>
+                {
+                    esCorrecto = true,
+                    mensaje = "Lista de clientes obtenida correctamente.",
+                    Data = dtos,
+                    codigoStatus = 200
+                });
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new CustomResponse<List<ClienteDto>>
+                {
+                    esCorrecto = false,
+                    mensaje = $"Error al obtener clientes: {ex.Message}",
+                    Data = null,
+                    codigoStatus = 500
+                });
+            }
         }
 
-        public Task<CustomResponse<ClienteDto>> AgregarClienteAsync(ClienteDto clienteDto)
+        public async Task<CustomResponse<ClienteDto>> ObtenerClientePorIdAsync(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var entidad = _clienteRepositorio.ObtenerClientePorId(id);
+                if (entidad == null)
+                {
+                    return await Task.FromResult(new CustomResponse<ClienteDto>
+                    {
+                        esCorrecto = false,
+                        mensaje = "Cliente no encontrado.",
+                        Data = null,
+                        codigoStatus = 404
+                    });
+                }
+
+                var dto = _mapper.Map<ClienteDto>(entidad);
+                return await Task.FromResult(new CustomResponse<ClienteDto>
+                {
+                    esCorrecto = true,
+                    mensaje = "Cliente obtenido correctamente.",
+                    Data = dto,
+                    codigoStatus = 200
+                });
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new CustomResponse<ClienteDto>
+                {
+                    esCorrecto = false,
+                    mensaje = $"Error al obtener cliente: {ex.Message}",
+                    Data = null,
+                    codigoStatus = 500
+                });
+            }
         }
 
-        public Task<CustomResponse<ClienteDto>> EliminarClienteAsync(int id)
+        public async Task<CustomResponse<ClienteDto>> AgregarClienteAsync(ClienteDto clienteDto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (clienteDto == null)
+                {
+                    return await Task.FromResult(new CustomResponse<ClienteDto>
+                    {
+                        esCorrecto = false,
+                        mensaje = "Cliente inválido.",
+                        Data = null,
+                        codigoStatus = 400
+                    });
+                }
+
+                var entidad = _mapper.Map<PracticaProgramada1GrupoB_DAL.Entidades.Cliente>(clienteDto);
+                _clienteRepositorio.AgregarCliente(entidad);
+
+                var dtoCreado = _mapper.Map<ClienteDto>(entidad);
+                return await Task.FromResult(new CustomResponse<ClienteDto>
+                {
+                    esCorrecto = true,
+                    mensaje = "Cliente agregado correctamente.",
+                    Data = dtoCreado,
+                    codigoStatus = 201
+                });
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new CustomResponse<ClienteDto>
+                {
+                    esCorrecto = false,
+                    mensaje = $"Error al agregar cliente: {ex.Message}",
+                    Data = null,
+                    codigoStatus = 500
+                });
+            }
         }
 
-        public Task<CustomResponse<ClienteDto>> ObtenerClientePorIdAsync(int id)
+        public async Task<CustomResponse<ClienteDto>> ActualizarClienteAsync(ClienteDto clienteDto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (clienteDto == null)
+                {
+                    return await Task.FromResult(new CustomResponse<ClienteDto>
+                    {
+                        esCorrecto = false,
+                        mensaje = "Cliente inválido.",
+                        Data = null,
+                        codigoStatus = 400
+                    });
+                }
+
+                var existente = _clienteRepositorio.ObtenerClientePorId(clienteDto.Id);
+                if (existente == null)
+                {
+                    return await Task.FromResult(new CustomResponse<ClienteDto>
+                    {
+                        esCorrecto = false,
+                        mensaje = "Cliente no encontrado.",
+                        Data = null,
+                        codigoStatus = 404
+                    });
+                }
+
+                var entidad = _mapper.Map<PracticaProgramada1GrupoB_DAL.Entidades.Cliente>(clienteDto);
+                _clienteRepositorio.ActualizarCliente(entidad);
+
+                var dtoActualizado = _mapper.Map<ClienteDto>(entidad);
+                return await Task.FromResult(new CustomResponse<ClienteDto>
+                {
+                    esCorrecto = true,
+                    mensaje = "Cliente actualizado correctamente.",
+                    Data = dtoActualizado,
+                    codigoStatus = 200
+                });
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new CustomResponse<ClienteDto>
+                {
+                    esCorrecto = false,
+                    mensaje = $"Error al actualizar cliente: {ex.Message}",
+                    Data = null,
+                    codigoStatus = 500
+                });
+            }
         }
 
-        public Task<CustomResponse<List<ClienteDto>>> ObtenerClientesAsync()
+        public async Task<CustomResponse<ClienteDto>> EliminarClienteAsync(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var existente = _clienteRepositorio.ObtenerClientePorId(id);
+                if (existente == null)
+                {
+                    return await Task.FromResult(new CustomResponse<ClienteDto>
+                    {
+                        esCorrecto = false,
+                        mensaje = "Cliente no encontrado.",
+                        Data = null,
+                        codigoStatus = 404
+                    });
+                }
+
+                var dtoAEliminar = _mapper.Map<ClienteDto>(existente);
+                _clienteRepositorio.EliminarCliente(id);
+
+                return await Task.FromResult(new CustomResponse<ClienteDto>
+                {
+                    esCorrecto = true,
+                    mensaje = "Cliente eliminado correctamente.",
+                    Data = dtoAEliminar,
+                    codigoStatus = 200
+                });
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new CustomResponse<ClienteDto>
+                {
+                    esCorrecto = false,
+                    mensaje = $"Error al eliminar cliente: {ex.Message}",
+                    Data = null,
+                    codigoStatus = 500
+                });
+            }
         }
     }
 }
