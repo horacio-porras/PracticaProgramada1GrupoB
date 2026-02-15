@@ -5,9 +5,13 @@ using PracticaProgramada1GrupoB_DAL.Repositorios.Cliente;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
 
-// Inyección de dependencias
+// Inyecciï¿½n de dependencias
 builder.Services.AddSingleton<IClienteRepositorio, ClienteRepositorio>();
 builder.Services.AddSingleton<IClienteServicio, ClienteServicio>();
 builder.Services.AddAutoMapper(cfg => { }, typeof(MapeoClases));

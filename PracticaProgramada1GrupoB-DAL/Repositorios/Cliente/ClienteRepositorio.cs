@@ -1,7 +1,8 @@
-﻿using System;
+﻿using PracticaProgramada1GrupoB_DAL.Entidades;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
+using System.Text;
 
 namespace PracticaProgramada1GrupoB_DAL.Repositorios.Cliente
 {
@@ -10,32 +11,34 @@ namespace PracticaProgramada1GrupoB_DAL.Repositorios.Cliente
 
         private List<Entidades.Cliente> clientes = new List<Entidades.Cliente>()
         {
-            new Entidades.Cliente() { Id = 1, Nombre = "Juan", Apellido = "Perez", CorreoElectronico = "juanperez@email.com", Telefono = "12345678" }
+            new Entidades.Cliente() { Id = 1, Nombre = "Juan", Apellido = "Perez", CorreoElectronico = "juanperez@email.com", Telefono = "12345678" },
+            new Entidades.Cliente() { Id = 2, Nombre = "Sonia", Apellido = "Mora", CorreoElectronico = "soniamora@email.com", Telefono = "87654321" }
         };
 
         public void ActualizarCliente(Entidades.Cliente cliente)
         {
-            if (cliente == null) throw new ArgumentNullException(nameof(cliente));
 
-            var existente = clientes.FirstOrDefault(c => c.Id == cliente.Id);
-            if (existente == null)
-                throw new InvalidOperationException($"Cliente con Id {cliente.Id} no encontrado.");
+            var index = clientes.FindIndex(c => c.Id == cliente.Id);
 
-            //Actualiza propiedades
-            existente.Nombre = cliente.Nombre;
-            existente.Apellido = cliente.Apellido;
-            existente.CorreoElectronico = cliente.CorreoElectronico;
-            existente.Telefono = cliente.Telefono;
+            clientes[index].Nombre = cliente.Nombre;
+            clientes[index].Apellido = cliente.Apellido;
+            clientes[index].CorreoElectronico = cliente.CorreoElectronico;
+            clientes[index].Telefono = cliente.Telefono;
         }
+
 
         public void AgregarCliente(Entidades.Cliente cliente)
         {
-            if (cliente == null) throw new ArgumentNullException(nameof(cliente));
+            var newId = clientes.Any() ? clientes.Max(c => c.Id) + 1 : 1;
 
-            //Asigna un Id nuevo secuencial
-            var nextId = clientes.Any() ? clientes.Max(c => c.Id) + 1 : 1;
-            cliente.Id = nextId;
-            clientes.Add(cliente);
+            clientes.Add(new Entidades.Cliente
+            {
+                Id = newId,
+                Nombre = cliente.Nombre,
+                Apellido = cliente.Apellido,
+                CorreoElectronico = cliente.CorreoElectronico,
+                Telefono = cliente.Telefono
+            });
         }
 
         public void EliminarCliente(int id)

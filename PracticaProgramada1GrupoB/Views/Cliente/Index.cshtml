@@ -1,63 +1,43 @@
-@model IEnumerable<PracticaProgramada1GrupoB_BLL.Dtos.ClienteDto>
-@using System.Linq
+@using PracticaProgramada1GrupoB_BLL.Dtos;
+@model List<ClienteDto>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Cliente Page";
 }
 
-<h1>Clientes</h1>
+<h1>Lista de Clientes</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCrearCliente">
+    Agregar Cliente
+</button>
 
 <!-- Table uses #tblCliente which Cliente.js initializes via AJAX -->
-<table id="tblCliente" class="display nowrap table" style="width:100%">
+<table id="tblCliente" class="table table-striped" style="width:100%">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Apellido)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CorreoElectronico)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Telefono)
-            </th>
-            <th></th>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Correo Electronico</th>
+            <th>Telefono</th>
         </tr>
     </thead>
-    <tbody>
-        @if (Model != null)
-        {
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@Html.DisplayFor(modelItem => item.Id)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Nombre)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Apellido)</td>
-                    <td>@Html.DisplayFor(modelItem => item.CorreoElectronico)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Telefono)</td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    </td>
-                </tr>
-            }
-        }
-    </tbody>
+    <tbody></tbody>
 </table>
 
+@await Html.PartialAsync("_Edit")
+@await Html.PartialAsync("_Create")
+
 @section Scripts {
-    @* Include validation scripts if needed by the page *@
     <partial name="_ValidationScriptsPartial" />
-    @* Load the client-side module that initializes #tblCliente *@
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/js/Cliente.js" asp-append-version="true"></script>
 }

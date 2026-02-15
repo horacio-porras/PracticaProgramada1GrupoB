@@ -84,92 +84,41 @@ namespace PracticaProgramada1GrupoB_BLL.Servicios.Cliente
 
         public async Task<CustomResponse<ClienteDto>> AgregarClienteAsync(ClienteDto clienteDto)
         {
-            try
-            {
-                if (clienteDto == null)
-                {
-                    return await Task.FromResult(new CustomResponse<ClienteDto>
-                    {
-                        esCorrecto = false,
-                        mensaje = "Cliente inválido.",
-                        Data = null,
-                        codigoStatus = 400
-                    });
-                }
+            var response = new CustomResponse<ClienteDto>();
 
-                var entidad = _mapper.Map<PracticaProgramada1GrupoB_DAL.Entidades.Cliente>(clienteDto);
-                _clienteRepositorio.AgregarCliente(entidad);
-
-                var dtoCreado = _mapper.Map<ClienteDto>(entidad);
-                return await Task.FromResult(new CustomResponse<ClienteDto>
-                {
-                    esCorrecto = true,
-                    mensaje = "Cliente agregado correctamente.",
-                    Data = dtoCreado,
-                    codigoStatus = 201
-                });
-            }
-            catch (Exception ex)
+            //Validaciones
+            if (clienteDto is null)
             {
-                return await Task.FromResult(new CustomResponse<ClienteDto>
-                {
-                    esCorrecto = false,
-                    mensaje = $"Error al agregar cliente: {ex.Message}",
-                    Data = null,
-                    codigoStatus = 500
-                });
+                response.esCorrecto = false;
+                response.mensaje = "El cliente no puede ser nulo.";
+                response.codigoStatus = 400; // Bad Request
+                return response;
             }
+
+            //Proceso
+            var clienteGuardar = _mapper.Map<PracticaProgramada1GrupoB_DAL.Entidades.Cliente>(clienteDto);
+             _clienteRepositorio.AgregarCliente(clienteGuardar);
+
+            return response;
         }
 
         public async Task<CustomResponse<ClienteDto>> ActualizarClienteAsync(ClienteDto clienteDto)
         {
-            try
+            var response = new CustomResponse<ClienteDto>();
+
+            if (clienteDto is null) //Validaciones
             {
-                if (clienteDto == null)
-                {
-                    return await Task.FromResult(new CustomResponse<ClienteDto>
-                    {
-                        esCorrecto = false,
-                        mensaje = "Cliente inválido.",
-                        Data = null,
-                        codigoStatus = 400
-                    });
-                }
-
-                var existente = _clienteRepositorio.ObtenerClientePorId(clienteDto.Id);
-                if (existente == null)
-                {
-                    return await Task.FromResult(new CustomResponse<ClienteDto>
-                    {
-                        esCorrecto = false,
-                        mensaje = "Cliente no encontrado.",
-                        Data = null,
-                        codigoStatus = 404
-                    });
-                }
-
-                var entidad = _mapper.Map<PracticaProgramada1GrupoB_DAL.Entidades.Cliente>(clienteDto);
-                _clienteRepositorio.ActualizarCliente(entidad);
-
-                var dtoActualizado = _mapper.Map<ClienteDto>(entidad);
-                return await Task.FromResult(new CustomResponse<ClienteDto>
-                {
-                    esCorrecto = true,
-                    mensaje = "Cliente actualizado correctamente.",
-                    Data = dtoActualizado,
-                    codigoStatus = 200
-                });
+                response.esCorrecto = false;
+                response.mensaje = "El cliente no puede ser nulo.";
+                response.codigoStatus = 400; // Bad Request
+                return await Task.FromResult(response);
             }
-            catch (Exception ex)
-            {
-                return await Task.FromResult(new CustomResponse<ClienteDto>
-                {
-                    esCorrecto = false,
-                    mensaje = $"Error al actualizar cliente: {ex.Message}",
-                    Data = null,
-                    codigoStatus = 500
-                });
-            }
+            //Proceso
+            var clienteActualiza = _mapper.Map<PracticaProgramada1GrupoB_DAL.Entidades.Cliente>(clienteDto);
+            _clienteRepositorio.ActualizarCliente(clienteActualiza);
+
+                return response;
+
         }
 
         public async Task<CustomResponse<ClienteDto>> EliminarClienteAsync(int id)
