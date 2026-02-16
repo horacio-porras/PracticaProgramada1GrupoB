@@ -3,88 +3,54 @@
         tabla: null,
 
         init() {
-            this.inicializarTabla();
+            this.inicializarTabla(); // inicializa estructura de DataTable vacía
             this.registrarEventos();
-
+            this.recargarTabla(); // carga los datos despues de inicializar la tabla
         },
         inicializarTabla() {
-            // Cargar datos primero manualmente para asegurar que se carguen correctamente
-            $.ajax({
-                url: '/Cliente/ObtenerClientes',
-                type: 'GET',
-                dataType: 'json',
-                success: (response) => {
-                    let datos = [];
-                    if (response && response.esCorrecto && response.data && Array.isArray(response.data)) {
-                        datos = response.data;
-                    }
-                    
-                    // Inicializar DataTables con los datos cargados
-                    this.tabla = $('#tblCliente').DataTable({
-                        data: datos,
-                        columns: [
-                            { data: 'id' },
-                            { data: 'nombre' },
-                            { data: 'apellido' },
-                            { data: 'correoElectronico' },
-                            { data: 'telefono' },
-                            {
-                                data: null,
-                                title: 'Acciones',
-                                orderable: false,
-                                render: function (data, type, row) {
-                                    return `
-                                        <button class="btn btn-sm btn-success btn-ver" data-id="${row.id}">
-                                            <i class="bi bi-pencil"></i> Ver
-                                        </button>
-                                        <button class="btn btn-sm btn-primary btn-editar" data-id="${row.id}">
-                                            <i class="bi bi-pencil"></i> Editar
-                                        </button>
-                                        <button class="btn btn-sm btn-danger btn-eliminar" data-id="${row.id}">
-                                            <i class="bi bi-trash"></i> Eliminar
-                                        </button>`;
-                                }
-                            }
-                        ],
-                        language: {
-                            url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-                        }
-                    });
-                },
-                error: (xhr, status, error) => {
-                    console.error('Error al cargar clientes:', error);
-                    // Inicializar tabla vacía en caso de error
-                    this.tabla = $('#tblCliente').DataTable({
-                        data: [],
-                        columns: [
-                            { data: 'id' },
-                            { data: 'nombre' },
-                            { data: 'apellido' },
-                            { data: 'correoElectronico' },
-                            { data: 'telefono' },
-                            {
-                                data: null,
-                                title: 'Acciones',
-                                orderable: false,
-                                render: function (data, type, row) {
-                                    return `
-                                        <button class="btn btn-sm btn-success btn-ver" data-id="${row.id}">
-                                            <i class="bi bi-pencil"></i> Ver
-                                        </button>
-                                        <button class="btn btn-sm btn-primary btn-editar" data-id="${row.id}">
-                                            <i class="bi bi-pencil"></i> Editar
-                                        </button>
-                                        <button class="btn btn-sm btn-danger btn-eliminar" data-id="${row.id}">
-                                            <i class="bi bi-trash"></i> Eliminar
-                                        </button>`;
-                                }
-                            }
-                        ],
-                        language: {
-                            url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-                        }
-                    });
+            // Inicializar DataTable una sola vez con configuración base
+            // Si ya existe, la destruimos y volvemos a crear para evitar duplicados
+            if ($.fn.dataTable.isDataTable('#tblCliente')) {
+                try {
+                    $('#tblCliente').DataTable().destroy();
+                    $('#tblCliente').empty(); // limpiar el DOM de la tabla para evitar duplicados
+                } catch (e) {
+                    console.warn('Error destroying previous DataTable instance', e);
                 }
+            }
+
+            this.tabla = $('#tblCliente').DataTable({
+                data: [], // empieza vacía, se llenará con recargarTabla()
+                columns: [
+                    { data: 'id' },
+                    { data: 'nombre' },
+                    { data: 'apellido' },
+                    { data: 'correoElectronico' },
+                    { data: 'telefono' },
+                    {
+                        data: null,
+                        title: 'Acciones',
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return `
+                                <button class="btn btn-sm btn-success btn-ver" data-id="${row.id}">
+                                    <i class="bi bi-pencil"></i> Ver
+                                </button>
+                                <button class="btn btn-sm btn-primary btn-editar" data-id="${row.id}">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                <button class="btn btn-sm btn-danger btn-eliminar" data-id="${row.id}">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>`;
+                        }
+                    }
+                ],
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                lengthMenu: [10, 25, 50],
+                deferRender: true,
             });
         },
         recargarTabla() {
@@ -95,10 +61,20 @@
                 dataType: 'json',
                 success: (response) => {
                     if (response && response.esCorrecto && response.data && Array.isArray(response.data)) {
-                        // Limpiar y agregar nuevos datos
+                        // Si tabla no existe por alguna razón la inicializamos
+                        if (!this.tabla || !$.fn.dataTable.isDataTable('#tblCliente')) {
+                            this.inicializarTabla();
+                        }
+
+                        // Limpiar y agregar nuevos datos, luego dibujar (no resetear paginación por defecto)
                         this.tabla.clear();
                         this.tabla.rows.add(response.data);
-                        this.tabla.draw();
+                        this.tabla.draw(false);
+                    } else {
+                        // Si la respuesta no es correcta, dejamos la tabla vacía
+                        if (this.tabla) {
+                            this.tabla.clear().draw();
+                        }
                     }
                 },
                 error: (xhr, status, error) => {

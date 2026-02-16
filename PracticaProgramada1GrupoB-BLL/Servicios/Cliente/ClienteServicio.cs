@@ -21,65 +21,28 @@ namespace PracticaProgramada1GrupoB_BLL.Servicios.Cliente
 
         public async Task<CustomResponse<List<ClienteDto>>> ObtenerClientesAsync()
         {
-            try
-            {
-                var entidades = _clienteRepositorio.ObtenerClientes();
-                var dtos = _mapper.Map<List<ClienteDto>>(entidades);
-                return await Task.FromResult(new CustomResponse<List<ClienteDto>>
-                {
-                    esCorrecto = true,
-                    mensaje = "Lista de clientes obtenida correctamente.",
-                    Data = dtos,
-                    codigoStatus = 200
-                });
-            }
-            catch (Exception ex)
-            {
-                return await Task.FromResult(new CustomResponse<List<ClienteDto>>
-                {
-                    esCorrecto = false,
-                    mensaje = $"Error al obtener clientes: {ex.Message}",
-                    Data = null,
-                    codigoStatus = 500
-                });
-            }
+            var response = new CustomResponse<List<ClienteDto>>();
+            response.Data = _mapper.Map<List<ClienteDto>>(_clienteRepositorio.ObtenerClientes());
+            return response;
         }
 
         public async Task<CustomResponse<ClienteDto>> ObtenerClientePorIdAsync(int id)
         {
-            try
-            {
-                var entidad = _clienteRepositorio.ObtenerClientePorId(id);
-                if (entidad == null)
-                {
-                    return await Task.FromResult(new CustomResponse<ClienteDto>
-                    {
-                        esCorrecto = false,
-                        mensaje = "Cliente no encontrado.",
-                        Data = null,
-                        codigoStatus = 404
-                    });
-                }
+            var response = new CustomResponse<ClienteDto>();
 
-                var dto = _mapper.Map<ClienteDto>(entidad);
-                return await Task.FromResult(new CustomResponse<ClienteDto>
-                {
-                    esCorrecto = true,
-                    mensaje = "Cliente obtenido correctamente.",
-                    Data = dto,
-                    codigoStatus = 200
-                });
-            }
-            catch (Exception ex)
+            var carro = _clienteRepositorio.ObtenerClientePorId(id);
+
+            if (carro is null)
             {
-                return await Task.FromResult(new CustomResponse<ClienteDto>
-                {
-                    esCorrecto = false,
-                    mensaje = $"Error al obtener cliente: {ex.Message}",
-                    Data = null,
-                    codigoStatus = 500
-                });
+                response.esCorrecto = false;
+                response.mensaje = "El cliente no existe, debe ingresarlo en el modulo de registro..."; 
+                response.codigoStatus = 404; // Not Found
+                return response;
             }
+
+
+            response.Data = _mapper.Map<ClienteDto>(_clienteRepositorio.ObtenerClientePorId(id));
+            return response;
         }
 
         public async Task<CustomResponse<ClienteDto>> AgregarClienteAsync(ClienteDto clienteDto)
@@ -123,41 +86,21 @@ namespace PracticaProgramada1GrupoB_BLL.Servicios.Cliente
 
         public async Task<CustomResponse<ClienteDto>> EliminarClienteAsync(int id)
         {
-            try
-            {
-                var existente = _clienteRepositorio.ObtenerClientePorId(id);
-                if (existente == null)
-                {
-                    return await Task.FromResult(new CustomResponse<ClienteDto>
-                    {
-                        esCorrecto = false,
-                        mensaje = "Cliente no encontrado.",
-                        Data = null,
-                        codigoStatus = 404
-                    });
-                }
+            var response = new CustomResponse<ClienteDto>();
 
-                var dtoAEliminar = _mapper.Map<ClienteDto>(existente);
-                _clienteRepositorio.EliminarCliente(id);
-
-                return await Task.FromResult(new CustomResponse<ClienteDto>
-                {
-                    esCorrecto = true,
-                    mensaje = "Cliente eliminado correctamente.",
-                    Data = dtoAEliminar,
-                    codigoStatus = 200
-                });
-            }
-            catch (Exception ex)
+            //Validaciones
+            if (id is 0)
             {
-                return await Task.FromResult(new CustomResponse<ClienteDto>
-                {
-                    esCorrecto = false,
-                    mensaje = $"Error al eliminar cliente: {ex.Message}",
-                    Data = null,
-                    codigoStatus = 500
-                });
+                response.esCorrecto = false;
+                response.mensaje = "El cliente no puede ser nulo.";
+                response.codigoStatus = 400; // Bad Request
+                return response;
             }
+
+
+            //Proceso   
+            _clienteRepositorio.EliminarCliente(id);
+            return response;
         }
     }
 }

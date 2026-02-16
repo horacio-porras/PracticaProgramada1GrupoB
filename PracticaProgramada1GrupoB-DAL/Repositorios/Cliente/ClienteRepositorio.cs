@@ -43,21 +43,32 @@ namespace PracticaProgramada1GrupoB_DAL.Repositorios.Cliente
 
         public void EliminarCliente(int id)
         {
-            var removedCount = clientes.RemoveAll(c => c.Id == id);
-            if (removedCount == 0)
-                throw new InvalidOperationException($"Cliente con Id {id} no encontrado.");
+            var removed = clientes.RemoveAll(c => c.Id == id);
         }
 
         public Entidades.Cliente ObtenerClientePorId(int id)
         {
-            return clientes.FirstOrDefault(c => c.Id == id)
-                ?? throw new InvalidOperationException($"Cliente con Id {id} no encontrado.");
+            var found = clientes.FirstOrDefault(c => c.Id == id);
+            if (found == null) return null;
+
+            // Return a copy to avoid exposing internal list items
+            return new Entidades.Cliente
+            {
+                Id = found.Id,
+                Nombre = found.Nombre,
+                Apellido = found.Apellido,
+                CorreoElectronico = found.CorreoElectronico,
+                Telefono = found.Telefono
+            };
         }
 
         public List<Entidades.Cliente> ObtenerClientes()
         {
-            //Devuelve una copia para evitar modificación externa de la colección interna
-            return clientes.ToList();
+            return clientes
+               .Select(c => new Entidades.Cliente { Id = c.Id, Nombre = c.Nombre, Apellido = c.Apellido, CorreoElectronico = c.CorreoElectronico, Telefono = c.Telefono })
+               .ToList();
         }
     }
+
 }
+
