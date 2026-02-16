@@ -126,6 +126,44 @@
             });
 
 
+            // VER DETALLE DEL CLIENTE
+            $('#tblCliente').on('click', '.btn-ver', function () {
+
+                const id = $(this).data('id');
+
+                $.get(`/Cliente/ObtenerClientePorId?id=${id}`, function (result) {
+
+                    if (result.esCorrecto) {
+
+                        let data = result.data;
+
+                        $('#detalleId').text(data.id);
+                        $('#detalleNombre').text(data.nombre);
+                        $('#detalleApellido').text(data.apellido);
+                        $('#detalleCorreo').text(data.correoElectronico);
+                        $('#detalleTelefono').text(data.telefono);
+
+                        let modal = new bootstrap.Modal(document.getElementById('modalDetalleCliente'));
+                        modal.show();
+
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: result.mensaje || 'No se pudo obtener el cliente.',
+                            icon: 'warning'
+                        });
+                    }
+
+                }).fail(function () {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Ocurrió un error al obtener el detalle del cliente.',
+                        icon: 'error'
+                    });
+                });
+
+            });
+
 
             //Editar
             $('#btnEditarCliente').on('click', function () {
